@@ -10,13 +10,15 @@ describe("Github Repo list", function(){
   // let serviceSpy = jasmine.createSpyObj("Github service", {
   //     getRepos: [repo1, repo2]
   // })
+  let routerSpy = jasmine.createSpyObj('router', {navigateTo: {}})
 
   beforeEach(function(){
-    // repoList.__Rewire__("githubService", serviceSpy)
+    repoList.__Rewire__("getRouter", () => routerSpy)
   })
 
   afterEach(function(){
     repoList.__ResetDependency__("githubService")
+    repoList.__ResetDependency__("getRouter")
   })
 
     describe("Repos for user", function(){
@@ -28,38 +30,29 @@ describe("Github Repo list", function(){
         expect(repoList).toBeDefined()
       })
 
-      it("Should fetch repos from service for user", function(done){
+
+      it("Should fetch repos from service for user and language", function(done){
         serviceSpy = jasmine.createSpyObj("Github service", {
             getRepos: [repo1, repo2]
         })
         repoList.__Rewire__("githubService", serviceSpy)
-        repoList("username").then(function(){
-          expect(serviceSpy.getRepos).toHaveBeenCalledWith("username")
+        repoList("username", "language1").then(function(){
+          expect(serviceSpy.getRepos).toHaveBeenCalledWith("username", "language1")
           done()
         })
       })
 
-      it("Should fetch repos from service for user", function(done){
-        serviceSpy = jasmine.createSpyObj("Github service", {
-            getRepos: [repo1, repo2]
-        })
-        repoList.__Rewire__("githubService", serviceSpy)
-          repoList("username").then(function(){
-            expect(serviceSpy.getRepos).toHaveBeenCalledWith("username")
-            done()
-          })
 
-
-      })
 
       it("Should create table of repos", function(done){
         serviceSpy = jasmine.createSpyObj("Github service", {
             getRepos: [repo1, repo2]
         })
         repoList.__Rewire__("githubService", serviceSpy)
-          repoList("username").then(function(html){
+          repoList("username", "language1").then(function(html){
             appendSetFixtures(html)
 
+            expect(serviceSpy.getRepos).toHaveBeenCalledWith("username", "language1")
             let rows = $("#repos table tr")
             expect(rows.length).toEqual(3)
             done()
@@ -71,14 +64,51 @@ describe("Github Repo list", function(){
             getRepos: []
         })
         repoList.__Rewire__("githubService", serviceSpy)
-          repoList("username").then(function(html){
+          repoList("username", "language1").then(function(html){
             appendSetFixtures(html)
 
+            expect(serviceSpy.getRepos).toHaveBeenCalledWith("username", "language1")
             let rows = $("#repos table tr")
             expect(rows.length).toEqual(0)
 
             let p = $("#repos p")
             expect(p.text()).toEqual("No Repos available")
+            done()
+          })
+      })
+
+      it("Should populate current language chosen", function(done){
+        serviceSpy = jasmine.createSpyObj("Github service", {
+            getRepos: [repo1, repo2]
+        })
+        repoList.__Rewire__("githubService", serviceSpy)
+          repoList("username", "language1").then(function(html){
+            appendSetFixtures(html)
+
+            expect(serviceSpy.getRepos).toHaveBeenCalledWith("username", "language1")
+            let rows = $("#repos table tr")
+            expect(rows.length).toEqual(3)
+
+            let chosenLanguage = $("#repos #preferredLanguage").val()
+            expect(chosenLanguage).toEqual("language1")
+            done()
+          })
+      })
+
+      it("Should navigate to chosen language", function(done){
+        serviceSpy = jasmine.createSpyObj("Github service", {
+            getRepos: [repo1, repo2]
+        })
+        repoList.__Rewire__("githubService", serviceSpy)
+          repoList("username", "language1").then(function(html){
+            appendSetFixtures(html)
+            repoList.__get__('initHandler')()
+
+            $("#repos #filterBtn").click()
+
+            expect(serviceSpy.getRepos).toHaveBeenCalledWith("username", "language1")
+            expect(routerSpy.navigateTo).toHaveBeenCalledWith("repos/username/language1")
+
             done()
           })
       })

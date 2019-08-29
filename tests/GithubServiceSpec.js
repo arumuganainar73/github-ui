@@ -3,7 +3,9 @@ import githubService from './../src/GithubService'
 describe("Github Service", function(){
 
   let repo1 = {name: "repo1", language: "JS", private: false, updated_at: "2015-01-29T11:52:47Z" }
-  let repos = [repo1]
+  let repo2 = {name: "repo2", language: "language1", private: false, updated_at: "2015-01-29T11:52:47Z" }
+  let repo3 = {name: "repo3", language: "language1", private: false, updated_at: "2015-01-29T11:52:47Z" }
+  let repos = [repo1, repo2, repo3]
   let axiosSpy
   // let axiosSpy = jasmine.createSpyObj("axios", {
   //     get: Promise.resolve({data: repos})
@@ -25,7 +27,7 @@ describe("Github Service", function(){
           get: Promise.resolve({data: repos})
       })
       githubService.__Rewire__("axios", axiosSpy)
-      
+
       expect(githubService.getRepos).toBeDefined()
     })
 
@@ -51,33 +53,34 @@ describe("Github Service", function(){
       expect(axiosSpy.get).toHaveBeenCalledWith("https://api.github.com/users/githubUserName/repos")
     })
 
-    it("Should handle success response", function(done){
+    it("Should return all repos for if language is all", function(done){
 
       axiosSpy = jasmine.createSpyObj("axios", {
           get: Promise.resolve({data: repos})
       })
       githubService.__Rewire__("axios", axiosSpy)
 
-      githubService.getRepos("user1").then(function(repos){
-        expect(repos.length).toEqual(1)
+      githubService.getRepos("user1", "all").then(function(repos){
+        expect(repos.length).toEqual(3)
         done()
       })
 
     })
 
-    it("Should return Repo object", function(done){
-
+    it("Should provide only language1 repos", function(done){
 
       axiosSpy = jasmine.createSpyObj("axios", {
           get: Promise.resolve({data: repos})
       })
       githubService.__Rewire__("axios", axiosSpy)
 
-      githubService.getRepos("user1").then(function(repos){
-        expect(repos[0].name).toEqual("repo1")
-        expect(repos[0].updatedAt).toEqual("2015-01-29T11:52:47Z")
+      githubService.getRepos("user1", "language1").then(function(repos){
+        expect(repos.length).toEqual(2)
+        expect(repos[0].name).toEqual("repo2")
+        expect(repos[1].name).toEqual("repo3")
         done()
       })
+
     })
 
     it("Should handle failure response", function(done){

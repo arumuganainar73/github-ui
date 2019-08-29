@@ -1,7 +1,9 @@
 import githubService from './GithubService'
+import getRouter from './router'
+import $ from 'jquery'
 
-async function repoList (username) {
-    let repos = await githubService.getRepos(username)
+async function repoList (username, language) {
+    let repos = await githubService.getRepos(username, language)
 
     if(repos.length == 0) {
       return `
@@ -13,6 +15,12 @@ async function repoList (username) {
 
     let template = `
                     <div id="repos">
+                      <form>
+                        <p id="username">${username}</p>
+                        <label for="preferredLanguage">Language</label>
+                        <input type="text" id="preferredLanguage" value="${language}"/>
+                        <button type="button" id="filterBtn">Filter</button>
+                      </form>
                       <table class="table">
                         <tr>
                           <th>name</th>
@@ -33,7 +41,20 @@ async function repoList (username) {
                       </table>
                     </div>
                    `
+                   $(() => {
+                     initHandler()
+                   })
       return template
+}
+
+
+
+let initHandler = () => {
+  $('#filterBtn').on('click', function(){
+    let language = $('#preferredLanguage').val()
+    let username = $("#username").text()
+    getRouter().navigateTo(`repos/${username}/${language}`)
+  })
 }
 
 export default repoList

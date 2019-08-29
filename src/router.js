@@ -21,8 +21,8 @@ let router
         .addRoute('home', (domEntryPoint) => {
             domEntryPoint.textContent = "You are in home page";
         })
-        .addRoute('repos/:user', (domEntryPoint, routeParams) => {
-          repoList(routeParams.user).then(function(html){
+        .addRoute('repos/:user/:language', (domEntryPoint, routeParams) => {
+          repoList(routeParams.user, routeParams.language).then(function(html){
             domEntryPoint.innerHTML = html
           })
         })
