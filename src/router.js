@@ -1,5 +1,6 @@
 import {createRouter} from 'vanilla-ui-router';
 import $ from 'jquery'
+import repoList from './RepoList'
 
 
 let router
@@ -19,6 +20,11 @@ let router
 
         .addRoute('home', (domEntryPoint) => {
             domEntryPoint.textContent = "You are in home page";
+        })
+        .addRoute('repos/:user', (domEntryPoint, routeParams) => {
+          repoList(routeParams.user).then(function(html){
+            domEntryPoint.innerHTML = html
+          })
         })
         .otherwise(() => {
             // If no route configuration matches, the otherwise route is invoked.
