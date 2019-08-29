@@ -1,3 +1,7 @@
+npm start
+
+npm test
+
 Jasmine - Test framework
 https://www.techiediaries.com/jasmine-testing-tutorial/
 
