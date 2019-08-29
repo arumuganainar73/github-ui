@@ -2,6 +2,9 @@ npm start
 
 npm test
 
+GithubApi
+https://api.github.com/repos/{username}/Clean_csharp_videworld
+
 Jasmine - Test framework
 https://www.techiediaries.com/jasmine-testing-tutorial/
 
